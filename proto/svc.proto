@@ -1,0 +1,18 @@
+syntax = "proto3";
+package pet_store;
+import "google/protobuf/empty.proto";
+
+service PetStore{
+  rpc Pulse(stream PulseRequest) returns (stream PulseResponse);
+  rpc Healthy(HealthyRequest) returns (google.protobuf.Empty);
+}
+
+message HealthyRequest{}
+
+message PulseRequest{
+  int64 correlation_id = 1;
+}
+
+message PulseResponse{
+  int64 correlation_id = 1;
+}

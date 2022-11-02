@@ -13,3 +13,12 @@ name = "client"
 path = "src/bin/client.rs"
 
 [dependencies]
+tonic = "*"
+tonic-reflection = "*"
+prost = "*"
+prost-types = "*"
+tokio = {version = "*", features = ["macros", "rt-multi-thread"]}
+tokio-stream = "*"
+
+[build-dependencies]
+tonic-build = "*"
