@@ -5,6 +5,8 @@ import "google/protobuf/empty.proto";
 service PetStore{
   rpc Pulse(stream PulseRequest) returns (stream PulseResponse);
   rpc Healthy(HealthyRequest) returns (google.protobuf.Empty);
+  rpc ListPets(ListPetsRequest) returns(stream ListPetsResponse);
+  rpc HostingPets(stream HostringPetsRequest) returns(HostingPetsResponse);
 }
 
 message HealthyRequest{}
@@ -15,4 +17,19 @@ message PulseRequest{
 
 message PulseResponse{
   int64 correlation_id = 1;
+}
+
+message ListPetsRequest{
+}
+message ListPetsResponse{
+  int64 id = 1;
+  string name = 2;
+}
+
+message HostringPetsRequest{
+  int64 id = 1;
+  string name = 2;
+}
+message HostingPetsResponse{
+  bool accept = 1;
 }

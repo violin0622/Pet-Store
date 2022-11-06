@@ -1,8 +1,13 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use crate::pet_store::pet_store_server::{PetStore, PetStoreServer};
-use tokio_stream::wrappers::ReceiverStream;
+use crate::pet_store::{
+    pet_store_server::{PetStore, PetStoreServer},
+    HostingPetsResponse, HostringPetsRequest, ListPetsRequest, ListPetsResponse, PulseRequest,
+    PulseResponse,
+};
+use tokio::sync::mpsc;
+use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 use tonic_reflection::server::Builder;
 
@@ -33,11 +38,10 @@ pub struct PetStoreServiceServer;
 
 #[tonic::async_trait]
 impl PetStore for PetStoreServiceServer {
-    type PulseStream = ReceiverStream<Result<pet_store::PulseResponse, Status>>;
-
+    type PulseStream = ReceiverStream<Result<PulseResponse, Status>>;
     async fn pulse(
         &self,
-        request: Request<Streaming<pet_store::PulseRequest>>,
+        request: Request<Streaming<PulseRequest>>,
     ) -> Result<Response<Self::PulseStream>, Status> {
         Err(Status::unimplemented("Unimplemented!"))
     }
@@ -47,5 +51,20 @@ impl PetStore for PetStoreServiceServer {
         request: Request<pet_store::HealthyRequest>,
     ) -> Result<Response<()>, Status> {
         Ok(Response::new(()))
+    }
+
+    type ListPetsStream = ReceiverStream<Result<ListPetsResponse, Status>>;
+    async fn list_pets(
+        &self,
+        request: Request<ListPetsRequest>,
+    ) -> Result<Response<Self::ListPetsStream>, Status> {
+        Err(Status::unimplemented("Unimplemented!"))
+    }
+
+    async fn hosting_pets(
+        &self,
+        request: Request<Streaming<HostringPetsRequest>>,
+    ) -> Result<Response<HostingPetsResponse>, Status> {
+        Err(Status::unimplemented("Unimplemented!"))
     }
 }

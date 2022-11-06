@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     client
         .healthy(Request::new(HealthyRequest {}))
         .await
-        .expect("Error detect service healthy");
+        .expect("Healthy service should return no error");
 
     println!("Server is healthy!");
     Ok(())
