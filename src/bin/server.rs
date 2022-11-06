@@ -63,8 +63,16 @@ impl PetStore for PetStoreServiceServer {
 
     async fn hosting_pets(
         &self,
-        request: Request<Streaming<HostringPetsRequest>>,
+        req: Request<Streaming<HostringPetsRequest>>,
     ) -> Result<Response<HostingPetsResponse>, Status> {
-        Err(Status::unimplemented("Unimplemented!"))
+        let mut req_stream = req.into_inner();
+        let mut pets = Vec::new();
+        while let Some(Ok(msg)) = req_stream.next().await {
+            println!("Receving pet {msg:?}");
+            pets.push(msg.clone());
+        }
+        let count = pets.len();
+        println!("Hosting {count} pets. All pets {pets:?} accepted");
+        Ok(Response::new(HostingPetsResponse { accept: true }))
     }
 }

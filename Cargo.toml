@@ -19,6 +19,7 @@ prost = "*"
 prost-types = "*"
 tokio = {version = "*", features = ["macros", "rt-multi-thread"]}
 tokio-stream = "*"
+async-stream = "*"
 
 [build-dependencies]
 tonic-build = "*"
