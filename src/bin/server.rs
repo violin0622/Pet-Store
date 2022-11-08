@@ -7,6 +7,7 @@ use crate::pet_store::{
     PulseResponse,
 };
 use tokio::sync::mpsc;
+use tokio::time::{self, Duration};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 use tonic_reflection::server::Builder;
@@ -58,7 +59,24 @@ impl PetStore for PetStoreServiceServer {
         &self,
         request: Request<ListPetsRequest>,
     ) -> Result<Response<Self::ListPetsStream>, Status> {
-        Err(Status::unimplemented("Unimplemented!"))
+        let (tx, rx) = mpsc::channel(10);
+        let mut counter = 0;
+        let mut interval = time::interval(Duration::from_millis(100));
+        tokio::spawn(async move {
+            while counter < 10 {
+                interval.tick().await;
+                counter += 1;
+                tx.send(Ok(ListPetsResponse {
+                    id: counter,
+                    name: format!("Pet No.{counter}"),
+                }))
+                .await
+                .unwrap();
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
+        // Err(Status::unimplemented("Unimplemented!"))
     }
 
     async fn hosting_pets(
@@ -67,7 +85,10 @@ impl PetStore for PetStoreServiceServer {
     ) -> Result<Response<HostingPetsResponse>, Status> {
         let mut req_stream = req.into_inner();
         let mut pets = Vec::new();
-        while let Some(Ok(msg)) = req_stream.next().await {
+
+        // 如果有导入 stkio:streamExt 的话，下面这一句也可以
+        // while let Some(Ok(msg)) = req_stream.next().await {
+        while let Ok(Some(msg)) = req_stream.message().await {
             println!("Receving pet {msg:?}");
             pets.push(msg.clone());
         }

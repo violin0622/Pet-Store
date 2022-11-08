@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use crate::pet_store::{pet_store_client::PetStoreClient, HealthyRequest, HostringPetsRequest};
+use crate::pet_store::{
+    pet_store_client::PetStoreClient, HealthyRequest, HostringPetsRequest, ListPetsRequest,
+};
 use async_stream::stream;
 use tokio::time::{self, Duration};
 use tonic::Request;
@@ -17,6 +19,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Healthy service should return no error");
     println!("Server is healthy!");
+
+    let mut stream = client
+        .list_pets(Request::new(ListPetsRequest {}))
+        .await
+        .expect("There should be pets.")
+        .into_inner();
+
+    let mut pets = vec![];
+    while let Ok(Some(pet)) = stream.message().await {
+        pets.push(pet.clone());
+        println!("Received pet {pet:?}");
+    }
 
     let outbound = stream! {
         let mut interval = time::interval(Duration::from_millis(100));
