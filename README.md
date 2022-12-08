@@ -15,3 +15,4 @@ Aims to build a full feature gRPC service.
   - [ ] Metrix
   - [ ] Logging
 - [ ] Complete errors define(using `anyhow` and `thiserror`)
+
