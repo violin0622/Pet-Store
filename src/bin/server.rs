@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use crate::pet_store::{
-    pet_store_server::{PetStore, PetStoreServer},
-    HostingPetsResponse, HostringPetsRequest, ListPetsRequest, ListPetsResponse, PulseRequest,
-    PulseResponse,
+use pet_store::{
+    google::r#type::Date,
+    pet_store::pet_store_server::{PetStore, PetStoreServer},
+    pet_store::*,
 };
 use tokio::sync::mpsc;
 use tokio::time::{self, Duration};
@@ -12,8 +12,7 @@ use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 use tonic_reflection::server::Builder;
 
-mod pet_store {
-    tonic::include_proto!("pet_store");
+mod reflection {
     pub(crate) const REFLECTION: &[u8] =
         tonic::include_file_descriptor_set!("pet_store_reflection");
 }
@@ -22,7 +21,7 @@ mod pet_store {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Hello, world!");
     let reflection = Builder::configure()
-        .register_encoded_file_descriptor_set(pet_store::REFLECTION)
+        .register_encoded_file_descriptor_set(reflection::REFLECTION)
         .build()?;
     let pet_store_svc = PetStoreServer::new(PetStoreServiceServer);
 
@@ -47,10 +46,7 @@ impl PetStore for PetStoreServiceServer {
         Err(Status::unimplemented("Unimplemented!"))
     }
 
-    async fn healthy(
-        &self,
-        request: Request<pet_store::HealthyRequest>,
-    ) -> Result<Response<()>, Status> {
+    async fn healthy(&self, request: Request<HealthyRequest>) -> Result<Response<()>, Status> {
         Ok(Response::new(()))
     }
 
@@ -69,6 +65,15 @@ impl PetStore for PetStoreServiceServer {
                 tx.send(Ok(ListPetsResponse {
                     id: counter,
                     name: format!("Pet No.{counter}"),
+                    species: String::from("Dog"),
+                    variety: String::from("Dachshund"),
+                    // birthday: None::<()>,
+                    birthday: Some(Date {
+                        year: 2000,
+                        month: 12,
+                        day: 30,
+                    }),
+                    comment: String::from(""),
                 }))
                 .await
                 .unwrap();
@@ -79,21 +84,35 @@ impl PetStore for PetStoreServiceServer {
         // Err(Status::unimplemented("Unimplemented!"))
     }
 
-    async fn hosting_pets(
+    async fn register_pet(
         &self,
-        req: Request<Streaming<HostringPetsRequest>>,
-    ) -> Result<Response<HostingPetsResponse>, Status> {
-        let mut req_stream = req.into_inner();
-        let mut pets = Vec::new();
+        request: tonic::Request<RegisterPetRequest>,
+    ) -> Result<tonic::Response<RegisterPetResponse>, tonic::Status> {
+        Err(Status::unimplemented("Unimplemented!"))
+    }
 
-        // 如果有导入 stkio:streamExt 的话，下面这一句也可以
-        // while let Some(Ok(msg)) = req_stream.next().await {
-        while let Ok(Some(msg)) = req_stream.message().await {
-            println!("Receving pet {msg:?}");
-            pets.push(msg.clone());
-        }
-        let count = pets.len();
-        println!("Hosting {count} pets. All pets {pets:?} accepted");
-        Ok(Response::new(HostingPetsResponse { accept: true }))
+    async fn unregister_pet(
+        &self,
+        request: tonic::Request<UnregisterPetRequest>,
+    ) -> Result<tonic::Response<()>, tonic::Status> {
+        Err(Status::unimplemented("Unimplemented!"))
+    }
+    async fn view_pet(
+        &self,
+        request: tonic::Request<ViewPetRequest>,
+    ) -> Result<tonic::Response<ViewPetResponse>, tonic::Status> {
+        Err(Status::unimplemented("Unimplemented!"))
+    }
+    async fn update_pet(
+        &self,
+        request: tonic::Request<UpdatePetRequest>,
+    ) -> Result<tonic::Response<()>, tonic::Status> {
+        Err(Status::unimplemented("Unimplemented!"))
+    }
+    async fn modify_pet(
+        &self,
+        request: tonic::Request<ModifyPetRequest>,
+    ) -> Result<tonic::Response<()>, tonic::Status> {
+        Err(Status::unimplemented("Unimplemented!"))
     }
 }

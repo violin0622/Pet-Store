@@ -1,12 +1,17 @@
 syntax = "proto3";
 package pet_store;
 import "google/protobuf/empty.proto";
+import "google/type/date.proto";
 
-service PetStore{
+service PetStore {
   rpc Pulse(stream PulseRequest) returns (stream PulseResponse);
   rpc Healthy(HealthyRequest) returns (google.protobuf.Empty);
   rpc ListPets(ListPetsRequest) returns(stream ListPetsResponse);
-  rpc HostingPets(stream HostringPetsRequest) returns(HostingPetsResponse);
+  rpc RegisterPet(RegisterPetRequest) returns(RegisterPetResponse);
+  rpc UnregisterPet(UnregisterPetRequest) returns (google.protobuf.Empty);
+  rpc ViewPet(ViewPetRequest) returns (ViewPetResponse);
+  rpc UpdatePet(UpdatePetRequest) returns (google.protobuf.Empty);
+  rpc ModifyPet(ModifyPetRequest) returns (google.protobuf.Empty);
 }
 
 message HealthyRequest{}
@@ -19,17 +24,73 @@ message PulseResponse{
   int64 correlation_id = 1;
 }
 
-message ListPetsRequest{
-}
+message ListPetsRequest{}
+
 message ListPetsResponse{
-  int64 id = 1;
+  uint64 id = 1;
   string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
 }
 
-message HostringPetsRequest{
-  int64 id = 1;
-  string name = 2;
+message RegisterPetRequest{
+  string name = 1;
+  string species = 2;
+  string variety = 3;
+  google.type.Date birthday = 4;
+  string comment = 5;
 }
-message HostingPetsResponse{
-  bool accept = 1;
+
+message RegisterPetResponse{
+  uint64 id = 1;
+  string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
+}
+
+message UnregisterPetRequest{
+  uint64 id = 1;
+}
+
+message ViewPetRequest{
+  uint64 id = 1;
+}
+
+message ViewPetResponse{
+  uint64 id = 1;
+  string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
+}
+
+message UpdatePetRequest{
+  uint64 id = 1;
+  string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
+}
+
+message ModifyPetRequest{
+  uint64 id = 1;
+  string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
+}
+message Pet {
+  uint64 id = 1;
+  string name = 2;
+  string species = 3;
+  string variety = 4;
+  google.type.Date birthday = 5;
+  string comment = 6;
 }
