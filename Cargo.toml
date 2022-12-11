@@ -20,6 +20,8 @@ prost-types = "*"
 tokio = {version = "*", features = ["macros", "rt-multi-thread"]}
 tokio-stream = "*"
 async-stream = "*"
+diesel = {version = "*", features = ["postgres"]}
+dotenv = "*"
 
 [build-dependencies]
 tonic-build = "*"

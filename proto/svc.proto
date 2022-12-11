@@ -86,6 +86,7 @@ message ModifyPetRequest{
   google.type.Date birthday = 5;
   string comment = 6;
 }
+
 message Pet {
   uint64 id = 1;
   string name = 2;
