@@ -12,6 +12,10 @@ path = "src/bin/server.rs"
 name = "client"
 path = "src/bin/client.rs"
 
+[[bin]]
+name = "try"
+path = "src/bin/try.rs"
+
 [dependencies]
 tonic = "*"
 tonic-reflection = "*"
@@ -20,8 +24,9 @@ prost-types = "*"
 tokio = {version = "*", features = ["macros", "rt-multi-thread"]}
 tokio-stream = "*"
 async-stream = "*"
-diesel = {version = "*", features = ["postgres"]}
-dotenv = "*"
+diesel = {version = "*", features = ["postgres", "chrono"]}
+dotenvy = "*"
+chrono = "*"
 
 [build-dependencies]
 tonic-build = "*"
