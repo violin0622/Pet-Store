@@ -20,7 +20,7 @@ prost-types = "*"
 tokio = {version = "*", features = ["macros", "rt-multi-thread"]}
 tokio-stream = "*"
 async-stream = "*"
-diesel = {version = "*", features = ["postgres", "chrono"]}
+diesel = {version = "*", features = ["postgres", "chrono", "r2d2"]}
 dotenvy = "*"
 chrono = "*"
 

@@ -1,11 +1,14 @@
 #![allow(unused_variables)]
 
 use crate::{
-    dao::new_connection,
+    dao::{
+        model::{self, NewPet},
+        new_connection,
+    },
     google::r#type::Date,
     pet_store::{pet_store_server::PetStore, *},
 };
-use diesel::PgConnection;
+use diesel::prelude::*;
 use tokio::sync::mpsc;
 use tokio::time::{self, Duration};
 use tokio_stream::wrappers::ReceiverStream;
@@ -69,9 +72,20 @@ impl PetStore for PetStoreService {
 
     async fn register_pet(
         &self,
-        request: tonic::Request<RegisterPetRequest>,
+        req: tonic::Request<RegisterPetRequest>,
     ) -> Result<tonic::Response<RegisterPetResponse>, tonic::Status> {
-        Err(Status::unimplemented("Unimplemented!"))
+        let conn = &mut new_connection();
+        let new_pet: Vec<NewPet> = vec![req.into_inner().into()];
+
+        use crate::dao::schema::pets;
+        let insert_result = diesel::insert_into(pets::table)
+            .values(new_pet)
+            // .get_results(conn)
+            .get_result::<model::Pet>(conn);
+        match insert_result {
+            Ok(pet) => Ok(Response::new(pet.into())),
+            Err(err) => Err(Status::internal(err.to_string())),
+        }
     }
 
     async fn unregister_pet(
