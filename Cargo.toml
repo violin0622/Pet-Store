@@ -12,10 +12,6 @@ path = "src/bin/server.rs"
 name = "client"
 path = "src/bin/client.rs"
 
-[[bin]]
-name = "try"
-path = "src/bin/try.rs"
-
 [dependencies]
 tonic = "*"
 tonic-reflection = "*"
