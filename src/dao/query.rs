@@ -1,16 +1,9 @@
+use super::model::{NewPet, Pet};
 use chrono::NaiveDate;
+use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use pet_store::model::{NewPet, Pet};
-use pet_store::new_connection;
 
-fn main() {
-    let conn = &mut new_connection();
-    let new_pets = insert(conn);
-    println!("inserting new pets: {new_pets:?}");
-    query(conn);
-}
-
-fn insert(conn: &mut PgConnection) -> Vec<Pet> {
+pub fn insert(conn: &mut PgConnection) -> Vec<Pet> {
     let new_pets = vec![
         NewPet {
             name: "Lucky".to_owned(),
@@ -28,15 +21,15 @@ fn insert(conn: &mut PgConnection) -> Vec<Pet> {
         },
     ];
 
-    use pet_store::schema::pets;
+    use super::schema::pets;
     diesel::insert_into(pets::table)
         .values(new_pets)
         .get_results(conn)
         .expect("Err query pets")
 }
 
-fn query(conn: &mut PgConnection) {
-    use pet_store::schema::pets::dsl::*;
+pub fn find(conn: &mut PgConnection) {
+    use super::schema::pets::dsl::*;
     let res = pets.limit(5).load::<Pet>(conn).expect("Err: query pets");
     println!("pets are {res:?}");
 }

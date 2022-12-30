@@ -1,4 +1,4 @@
-use crate::schema::pets;
+use super::schema::pets;
 use chrono::NaiveDate;
 use diesel::prelude::*;
 
