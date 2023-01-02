@@ -47,19 +47,6 @@ impl From<pet_store::RegisterPetResponse> for Pet {
     }
 }
 
-impl Into<pet_store::RegisterPetResponse> for Pet {
-    fn into(self) -> pet_store::RegisterPetResponse {
-        pet_store::RegisterPetResponse {
-            id: self.id as u64,
-            name: self.name,
-            species: self.species,
-            variety: self.variety,
-            birthday: None,
-            comment: self.description.unwrap_or("".to_string()),
-        }
-    }
-}
-
 #[derive(Insertable, Debug)]
 #[diesel(table_name=pets)]
 pub struct NewPet {

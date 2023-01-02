@@ -78,14 +78,17 @@ impl PetStore for PetStoreService {
         let new_pet: Vec<NewPet> = vec![req.into_inner().into()];
 
         use crate::dao::schema::pets;
-        let insert_result = diesel::insert_into(pets::table)
+        diesel::insert_into(pets::table)
             .values(new_pet)
-            // .get_results(conn)
-            .get_result::<model::Pet>(conn);
-        match insert_result {
-            Ok(pet) => Ok(Response::new(pet.into())),
-            Err(err) => Err(Status::internal(err.to_string())),
-        }
+            .get_result::<model::Pet>(conn)
+            .map_or_else(
+                |err| Err(Status::internal(err.to_string())),
+                |pet| Ok(Response::new(pet.into())),
+            )
+        // match insert_result {
+        //     Ok(pet) => Ok(Response::new(pet.into())),
+        //     Err(err) => Err(Status::internal(err.to_string())),
+        // }
     }
 
     async fn unregister_pet(
