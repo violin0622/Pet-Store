@@ -21,9 +21,7 @@ impl From<pet_store::Pet> for Pet {
             name: req.name,
             species: req.species,
             variety: req.variety,
-            birthday: req.birthday.map_or(None::<NaiveDate>, |d| {
-                NaiveDate::from_ymd_opt(d.year, d.month as u32, d.day as u32)
-            }),
+            birthday: req.birthday.map(|d| NaiveDate::from(d)),
             description: Some(req.comment),
         }
     }
@@ -36,9 +34,7 @@ impl From<pet_store::RegisterPetResponse> for Pet {
             name: req.name,
             species: req.species,
             variety: req.variety,
-            birthday: req.birthday.map_or(None, |d| {
-                NaiveDate::from_ymd_opt(d.year, d.month as u32, d.day as u32)
-            }),
+            birthday: req.birthday.map(|d| NaiveDate::from(d)),
             description: match req.comment.len() {
                 0 => None,
                 _ => Some(req.comment),
@@ -63,8 +59,11 @@ impl From<RegisterPetRequest> for NewPet {
             name: req.name,
             species: req.species,
             variety: req.variety,
-            birthday: None,
-            description: None,
+            birthday: req.birthday.map(|d| NaiveDate::from(d)),
+            description: match req.comment.len() {
+                0 => None,
+                _ => Some(req.comment),
+            },
         }
     }
 }
@@ -75,8 +74,11 @@ impl From<pet_store::Pet> for NewPet {
             name: pet.name,
             species: pet.species,
             variety: pet.variety,
-            birthday: None,
-            description: None,
+            birthday: pet.birthday.map(|d| d.into()),
+            description: match pet.comment.len() {
+                0 => None,
+                _ => Some(pet.comment),
+            },
         }
     }
 }

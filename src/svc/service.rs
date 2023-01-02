@@ -3,7 +3,7 @@
 use crate::{
     dao::{
         model::{self, NewPet},
-        new_connection,
+        new_connection, DB,
     },
     google::r#type::Date,
     pet_store::{pet_store_server::PetStore, *},
@@ -14,11 +14,13 @@ use tokio::time::{self, Duration};
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status, Streaming};
 
-pub struct PetStoreService {}
+pub struct PetStoreService {
+    db: DB,
+}
 
 impl PetStoreService {
     pub fn new() -> Self {
-        Self {}
+        Self { db: DB::new() }
     }
 }
 
@@ -54,11 +56,6 @@ impl PetStore for PetStoreService {
                     species: String::from("Dog"),
                     variety: String::from("Dachshund"),
                     birthday: None::<Date>,
-                    // birthday: Some(Date {
-                    //     year: 2000,
-                    //     month: 12,
-                    //     day: 30,
-                    // }),
                     comment: String::from(""),
                 }))
                 .await
@@ -67,7 +64,6 @@ impl PetStore for PetStoreService {
         });
 
         Ok(Response::new(ReceiverStream::new(rx)))
-        // Err(Status::unimplemented("Unimplemented!"))
     }
 
     async fn register_pet(
@@ -85,10 +81,6 @@ impl PetStore for PetStoreService {
                 |err| Err(Status::internal(err.to_string())),
                 |pet| Ok(Response::new(pet.into())),
             )
-        // match insert_result {
-        //     Ok(pet) => Ok(Response::new(pet.into())),
-        //     Err(err) => Err(Status::internal(err.to_string())),
-        // }
     }
 
     async fn unregister_pet(
@@ -97,12 +89,17 @@ impl PetStore for PetStoreService {
     ) -> Result<tonic::Response<()>, tonic::Status> {
         Err(Status::unimplemented("Unimplemented!"))
     }
+
     async fn view_pet(
         &self,
-        request: tonic::Request<ViewPetRequest>,
+        req: tonic::Request<ViewPetRequest>,
     ) -> Result<tonic::Response<ViewPetResponse>, tonic::Status> {
-        Err(Status::unimplemented("Unimplemented!"))
+        self.db.take_pet(req.into_inner().id as i64).map_or_else(
+            |err| Err(Status::internal(err.to_string())),
+            |pet| Ok(Response::new(pet.into())),
+        )
     }
+
     async fn update_pet(
         &self,
         request: tonic::Request<UpdatePetRequest>,

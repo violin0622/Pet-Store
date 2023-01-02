@@ -1,7 +1,12 @@
-use super::model::{NewPet, Pet};
+#![allow(dead_code)]
+
+use super::{
+    model::{NewPet, Pet},
+    new_connection,
+    schema::pets,
+};
 use chrono::NaiveDate;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
+use diesel::{pg::PgConnection, prelude::*};
 
 pub fn insert(conn: &mut PgConnection) -> Vec<Pet> {
     let new_pets = vec![
@@ -21,15 +26,30 @@ pub fn insert(conn: &mut PgConnection) -> Vec<Pet> {
         },
     ];
 
-    use super::schema::pets;
     diesel::insert_into(pets::table)
         .values(new_pets)
         .get_results(conn)
         .expect("Err query pets")
 }
+pub struct DB {}
+impl DB {
+    pub fn new() -> Self {
+        Self {}
+    }
+    pub fn insert_pet(&self, p: NewPet) -> QueryResult<Pet> {
+        let conn = &mut new_connection();
+        diesel::insert_into(pets::table)
+            .values(vec![p])
+            .get_result(conn)
+    }
+    pub fn insert_pets(&self, p: Vec<NewPet>) -> QueryResult<Vec<Pet>> {
+        let conn = &mut new_connection();
+        diesel::insert_into(pets::table).values(p).get_results(conn)
+    }
 
-pub fn find(conn: &mut PgConnection) {
-    use super::schema::pets::dsl::*;
-    let res = pets.limit(5).load::<Pet>(conn).expect("Err: query pets");
-    println!("pets are {res:?}");
+    pub fn take_pet(&self, id: i64) -> QueryResult<Pet> {
+        let conn = &mut new_connection();
+        use pets::dsl::pets;
+        pets.find(id).first(conn)
+    }
 }
