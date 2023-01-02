@@ -9,6 +9,12 @@ Aims to build a full feature gRPC service.
 - [x] Server streaming call
 - [ ] Binary streaming call
 - [ ] PostgreSQL backend (Dissel)
+  - [x] diesel migration
+  - [ ] CURD AST
+  - [ ] async connection 
+  - [ ] onnection pool
+  - [ ] SQL debug log
+  - [ ] OpenTelemetry integrition
 - [x] Multi-thread tokio runtime
 - [ ] OpenTelemetry support
   - [ ] Tracing
