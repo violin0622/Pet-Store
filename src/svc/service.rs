@@ -49,25 +49,6 @@ impl PetStore for PetStoreService {
                 Ok(Response::new(ReceiverStream::new(rx)))
             },
         )
-        // let (tx, rx) = mpsc::channel(10);
-        // let mut counter = 0;
-        // let mut interval = time::interval(Duration::from_millis(100));
-        // tokio::spawn(async move {
-        //     while counter < 10 {
-        //         interval.tick().await;
-        //         counter += 1;
-        //         tx.send(Ok(ListPetsResponse {
-        //             id: counter,
-        //             name: format!("Pet No.{counter}"),
-        //             species: String::from("Dog"),
-        //             variety: String::from("Dachshund"),
-        //             birthday: None::<Date>,
-        //             comment: String::from(""),
-        //         }))
-        //         .await
-        //         .unwrap();
-        //     }
-        // });
     }
 
     async fn register_pet(
