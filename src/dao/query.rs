@@ -36,12 +36,14 @@ impl DB {
     pub fn new() -> Self {
         Self {}
     }
+
     pub fn insert_pet(&self, p: NewPet) -> QueryResult<Pet> {
         let conn = &mut new_connection();
         diesel::insert_into(pets::table)
             .values(vec![p])
             .get_result(conn)
     }
+
     pub fn insert_pets(&self, p: Vec<NewPet>) -> QueryResult<Vec<Pet>> {
         let conn = &mut new_connection();
         diesel::insert_into(pets::table).values(p).get_results(conn)
@@ -51,5 +53,16 @@ impl DB {
         let conn = &mut new_connection();
         use pets::dsl::pets;
         pets.find(id).first(conn)
+    }
+
+    pub fn list_pets(&self) -> QueryResult<Vec<Pet>> {
+        let conn = &mut new_connection();
+        use pets::dsl::pets;
+        pets.load(conn)
+    }
+
+    pub fn delete_pet(&self, id: i64) -> QueryResult<usize> {
+        use pets::dsl;
+        diesel::delete(dsl::pets.find(id)).execute(&mut new_connection())
     }
 }
