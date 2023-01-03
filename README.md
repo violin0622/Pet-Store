@@ -10,7 +10,7 @@ Aims to build a full feature gRPC service.
 - [ ] Binary streaming call
 - [ ] PostgreSQL backend (Dissel)
   - [x] diesel migration
-  - [ ] CURD AST
+  - [x] CURD AST
   - [ ] async connection 
   - [ ] onnection pool
   - [ ] SQL debug log

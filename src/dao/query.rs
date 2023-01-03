@@ -2,46 +2,34 @@
 
 use super::{
     model::{NewPet, Pet},
-    new_connection,
+    new_conn_pool, new_connection,
     schema::pets,
 };
-use chrono::NaiveDate;
-use diesel::{pg::PgConnection, prelude::*};
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, Pool},
+};
 
-pub fn insert(conn: &mut PgConnection) -> Vec<Pet> {
-    let new_pets = vec![
-        NewPet {
-            name: "Lucky".to_owned(),
-            species: "Dog".to_owned(),
-            variety: "Unknown".to_owned(),
-            birthday: NaiveDate::from_ymd_opt(2000, 12, 2),
-            description: None,
-        },
-        NewPet {
-            name: "Happy".to_owned(),
-            species: "Dog".to_owned(),
-            variety: "Unknown".to_owned(),
-            birthday: NaiveDate::from_ymd_opt(2002, 2, 28),
-            description: None,
-        },
-    ];
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-    diesel::insert_into(pets::table)
-        .values(new_pets)
-        .get_results(conn)
-        .expect("Err query pets")
+pub struct DB {
+    conns: Pool<ConnectionManager<PgConnection>>,
 }
-pub struct DB {}
 impl DB {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            conns: new_conn_pool(),
+        }
     }
 
-    pub fn insert_pet(&self, p: NewPet) -> QueryResult<Pet> {
-        let conn = &mut new_connection();
-        diesel::insert_into(pets::table)
+    pub fn insert_pet(&self, p: NewPet) -> Result<Pet> {
+        let conn = &mut self.conns.get()?;
+        let pet = diesel::insert_into(pets::table)
             .values(vec![p])
-            .get_result(conn)
+            // .get_result::<Pet>(conn)?;
+            .get_result(conn)?;
+        Ok(pet)
+        // .map_err(|e| e.into())
     }
 
     pub fn insert_pets(&self, p: Vec<NewPet>) -> QueryResult<Vec<Pet>> {
