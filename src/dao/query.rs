@@ -2,7 +2,7 @@
 
 use super::{
     model::{NewPet, Pet},
-    new_conn_pool, new_connection,
+    new_conn_pool,
     schema::pets,
 };
 use diesel::{
@@ -23,34 +23,31 @@ impl DB {
     }
 
     pub fn insert_pet(&self, p: NewPet) -> Result<Pet> {
-        let conn = &mut self.conns.get()?;
         let pet = diesel::insert_into(pets::table)
             .values(vec![p])
-            // .get_result::<Pet>(conn)?;
-            .get_result(conn)?;
+            .get_result(&mut self.conns.get()?)?;
         Ok(pet)
-        // .map_err(|e| e.into())
     }
 
-    pub fn insert_pets(&self, p: Vec<NewPet>) -> QueryResult<Vec<Pet>> {
-        let conn = &mut new_connection();
-        diesel::insert_into(pets::table).values(p).get_results(conn)
+    pub fn insert_pets(&self, p: Vec<NewPet>) -> Result<Vec<Pet>> {
+        let pets = diesel::insert_into(pets::table)
+            .values(p)
+            .get_results(&mut self.conns.get()?)?;
+        Ok(pets)
     }
 
-    pub fn take_pet(&self, id: i64) -> QueryResult<Pet> {
-        let conn = &mut new_connection();
-        use pets::dsl::pets;
-        pets.find(id).first(conn)
+    pub fn take_pet(&self, id: i64) -> Result<Pet> {
+        let pet = pets::table.find(id).first(&mut self.conns.get()?)?;
+        Ok(pet)
     }
 
-    pub fn list_pets(&self) -> QueryResult<Vec<Pet>> {
-        let conn = &mut new_connection();
-        use pets::dsl::pets;
-        pets.load(conn)
+    pub fn list_pets(&self) -> Result<Vec<Pet>> {
+        let pets = pets::table.load(&mut self.conns.get()?)?;
+        Ok(pets)
     }
 
-    pub fn delete_pet(&self, id: i64) -> QueryResult<usize> {
-        use pets::dsl;
-        diesel::delete(dsl::pets.find(id)).execute(&mut new_connection())
+    pub fn delete_pet(&self, id: i64) -> Result<()> {
+        diesel::delete(pets::dsl::pets.find(id)).execute(&mut self.conns.get()?)?;
+        Ok(())
     }
 }

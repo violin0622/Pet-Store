@@ -12,7 +12,7 @@ Aims to build a full feature gRPC service.
   - [x] diesel migration
   - [x] CURD AST
   - [ ] async connection 
-  - [ ] onnection pool
+  - [x] onnection pool
   - [ ] SQL debug log
   - [ ] OpenTelemetry integrition
 - [x] Multi-thread tokio runtime
