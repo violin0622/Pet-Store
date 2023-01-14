@@ -13,6 +13,12 @@ use diesel::{
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 pub struct DB {
+    // r2d2 线程池。 通过同时管理多个链接，解决了并发访问数据库的问题。
+    // 但是 r2d2 是个同步的线程池 —— 当新建链接，且正好网络拥塞响应慢时，
+    // 建立链接的时间会使客户端线程阻塞住。
+    // 如果 r2d2 可以管理异步链接的话就可以解决这个问题， 但遗憾的是作者并
+    // 不打算加入异步支持。
+    // 或许需要用 bb8 来添加异步支持。
     conns: Pool<ConnectionManager<PgConnection>>,
 }
 impl DB {
