@@ -24,6 +24,8 @@ diesel = {version = "*", features = ["postgres", "chrono", "r2d2"]}
 dotenvy = "*"
 chrono = "*"
 r2d2 = "*"
+tracing = "*"
+tracing-subscriber = "*"
 
 [build-dependencies]
 tonic-build = "*"

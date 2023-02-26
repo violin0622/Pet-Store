@@ -1,6 +1,8 @@
 use pet_store::{pet_store::pet_store_server::PetStoreServer, svc::PetStoreService};
 use tonic::transport::Server;
 use tonic_reflection::server::Builder;
+use tracing::info;
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 mod reflection {
     pub(crate) const REFLECTION: &[u8] =
@@ -9,7 +11,8 @@ mod reflection {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Hello, world!");
+    tracing_subscriber::registry().with(fmt::layer()).init();
+    info!("Hello, world!");
     let reflection = Builder::configure()
         .register_encoded_file_descriptor_set(reflection::REFLECTION)
         .build()?;

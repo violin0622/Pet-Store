@@ -7,6 +7,7 @@ use crate::{
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status, Streaming};
+use tracing::{info, info_span};
 
 pub struct PetStoreService {
     db: DB,
@@ -55,9 +56,15 @@ impl PetStore for PetStoreService {
         &self,
         req: tonic::Request<RegisterPetRequest>,
     ) -> Result<tonic::Response<RegisterPetResponse>, tonic::Status> {
+        let sp = info_span!("register pet");
+        let _sp = sp.enter();
+        info!("registering pet");
         self.db.insert_pet(req.into_inner().into()).map_or_else(
             |err| Err(Status::internal(err.to_string())),
-            |pet| Ok(Response::new(pet.into())),
+            |pet| {
+                info!("pet registered");
+                Ok(Response::new(pet.into()))
+            },
         )
     }
 
